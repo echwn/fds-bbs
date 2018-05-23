@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+const postAPI = axios.create({
+  
+});
+
 const rootEl = document.querySelector('.root');
 const templates = {
   postList: document.querySelector('#post-list').content,
@@ -14,10 +18,10 @@ function render(fragment) {
 }
 
 async function indexPage() {
-  const res = await axios.get('http://localhost:3000/posts');
+  const res = await postAPI.get('http://localhost:3000/posts');
   const listFragment = document.importNode(templates.postList, true);
 
-  fragment.querySelector('.post-list__login-btn').addEventListener('click', e => {
+  listFragment.querySelector('.post-list__login-btn').addEventListener('click', e => {
     loginPage();
   });
 
@@ -35,7 +39,7 @@ async function indexPage() {
 }
 
 async function postContentPage(postId) {
-  const res = await axios.get(`http//localhost:3000/posts/${postId}`);
+  const res = await postAPI.get(`http//localhost:3000/posts/${postId}`);
   const fragment = document.importNode(templates.postContent, true);
   fragment.querySelector('.post-content__title').textContent = res.data.title;
   fragment.querySelector('.post-content__body').textContent = res.data.body;
@@ -48,7 +52,19 @@ async function postContentPage(postId) {
 
 async function loginPage() {
   const fragment = document.importNode(templates.login, true);
-
+  const formEl = fragment.querySelector('.login__form');
+  formEl.addEventListener('submit', async e => {
+    const payload = {
+      username: e.target.elements.username.value,
+      password: e.target.elements.password.value
+    }
+    e.preventDefault();
+    const res = await postAPI.post('http//localhost:3000/users/login', payload);
+    localStorage.setItem('token', res.data.token);
+    postAPI.defaults.headers['Authorization'] = res.data.token;
+    indexPage();
+  });
+  
   render(fragment);
 }
 
