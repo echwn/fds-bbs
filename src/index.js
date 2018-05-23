@@ -13,6 +13,7 @@ const templates = {
   postItem: document.querySelector('#post-item').content,
   postContent: document.querySelector('#post-content').content,
   login: document.querySelector('#login').content,
+  postForm: document.querySelector('#post-form').content,
 }
 
 function render(fragment) {
@@ -33,6 +34,10 @@ async function indexPage() {
     delete postAPI.defaults.headers['Authorization'];
     rootEl.classList.remove('root--authed');
     indexPage();
+  });
+
+  listFragment.querySelector('.post-list__new-post-btn').addEventListener('click', e => {
+    postFormPage();
   });
 
   res.data.forEach(post => {
@@ -76,6 +81,12 @@ async function loginPage() {
     indexPage();
   });
   
+  render(fragment);
+}
+
+async function postFormPage() {
+  const fragment = document.importNode(templates.postForm, true);
+
   render(fragment);
 }
 

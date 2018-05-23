@@ -10,11 +10,10 @@ body {
       display: none;
     }
   }
-  
-  &__logout-btn {
+
+  &__logout-btn, &__new-post-btn {
     display: none;
     .root--authed & {
       display: inline-block;
     }
   }
-}
