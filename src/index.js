@@ -33,7 +33,10 @@ function render(fragment) {
 }
 
 async function indexPage() {
+  rootEl.classList.add('root--loading');
   const res = await postAPI.get('/posts?_expand=user');
+  rootEl.classList.remove('root--loading');
+
   const listFragment = document.importNode(templates.postList, true);
 
   listFragment.querySelector('.post-list__login-btn').addEventListener('click', e => {
@@ -51,7 +54,7 @@ async function indexPage() {
 
   res.data.forEach(post => {
     const fragment = document.importNode(templates.postItem, true);
-    fragment.querySelector('.post-item__author').textContent = post.user.username
+    fragment.querySelector('.post-item__author').textContent = post.user.username;
     const pEl = fragment.querySelector('.post-item__title');
     pEl.textContent = post.title;
     pEl.addEventListener('click', e => {
@@ -80,6 +83,15 @@ async function postContentPage(postId) {
       itemFragment.querySelector('.comment-item__body').textContent = comment.body;
       commentsFragment.querySelector('.comments__list').appendChild(itemFragment);
     })
+    const formEl = commentsFragment.querySelector('.comments__form');
+    formEl.addEventListener('submit', async e => {
+      e.preventDefault();
+      const payload = {
+        body: e.target.elements.body.value
+      };
+      const res = await postAPI.post(`/posts/${postId}/comments`, payload);
+      postContentPage(postId);
+    });
     fragment.appendChild(commentsFragment);
   }
 
@@ -100,7 +112,6 @@ async function loginPage() {
     login(res.data.token);
     indexPage();
   })
-
   render(fragment);
 }
 
